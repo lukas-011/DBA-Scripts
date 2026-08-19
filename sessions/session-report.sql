@@ -3,7 +3,7 @@
               point-in-time snapshot before a restart or during an incident.
    VIEWS    : gv$session
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : None
    OUTPUT   : Spools to session_report.txt in the current working directory,
               overwriting any existing file of that name.

@@ -7,7 +7,7 @@
               v$recovery_file_dest, gv$session, dba_indexes
    LICENSE  : None - deliberately avoids every dba_hist_* view so this can run
               on an unlicensed database.
-   RAC      : Mixed by design - gv$ for per-instance state (instances up,
+   RAC      : MIXED - gv$ for per-instance state (instances up,
               blocked sessions), v$ for controlfile-wide facts (archiving,
               FRA). See the RAC section of the top-level README.
    PARAMS   : None

@@ -3,7 +3,9 @@
               heaviest statements running right now.
    VIEWS    : gv$sqlarea
    LICENSE  : None (cursor cache, not AWR)
-   RAC      : Yes (totals summed across instances)
+   RAC      : GV$ REQUIRED - totals are summed across instances, because a
+              statement's cost to the database IS cluster-wide. Add sa.inst_id
+              to the SELECT and GROUP BY to see which node ran it.
    PARAMS   : &top_n - how many statements to return, e.g. 25
    NOTES    : Cursor cache only. Statements aged out of the shared pool are
               gone, so this is a short-term view - for history that survives

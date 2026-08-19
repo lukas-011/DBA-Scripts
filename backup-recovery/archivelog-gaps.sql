@@ -3,7 +3,7 @@
               stop for point-in-time recovery past that point.
    VIEWS    : v$archived_log
    LICENSE  : None
-   RAC      : Yes - and this is the script most often got WRONG on RAC. Each
+   RAC      : V$ CORRECT - and the script most often got WRONG on RAC. Each
               instance is its own redo THREAD# with its own independent
               sequence numbering, so gaps must be detected per thread (the
               PARTITION BY below). Comparing sequences across threads invents

@@ -3,7 +3,7 @@
               waited. Shows where the database spends its time overall.
    VIEWS    : gv$system_event
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED; each instance accumulates its own waits)
+   RAC      : GV$ REQUIRED - each instance accumulates its own waits)
    PARAMS   : &top_n - how many events to return, e.g. 20
    NOTES    : These are totals SINCE STARTUP, so they are dominated by whatever
               happened days ago and are near-useless for diagnosing a problem

@@ -3,7 +3,7 @@
               is using for cache fusion traffic.
    VIEWS    : gv$cluster_interconnects
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED)
+   RAC      : GV$ REQUIRED
    PARAMS   : None
    NOTES    : The classic misconfiguration is an interconnect resolving to the
               PUBLIC network, which cripples cache fusion. IS_PUBLIC should be

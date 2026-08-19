@@ -3,7 +3,7 @@
               way to understand an unfamiliar database.
    VIEWS    : gv$parameter
    LICENSE  : None
-   RAC      : Yes - gv$ is REQUIRED and this is one of the highest-value RAC
+   RAC      : GV$ REQUIRED - one of the highest-value RAC
               checks in the toolkit. Parameters CAN legitimately differ per
               instance, but an unintended difference (one node with a smaller
               SGA, a different optimizer setting, a stale value after a
@@ -13,6 +13,11 @@
    NOTES    : isdefault='FALSE' means set in the spfile or altered at runtime.
               Cross-check gv$spparameter for what will survive a restart -
               an ALTER SYSTEM ... SCOPE=MEMORY change shows here but not there.
+              Query 2's LISTAGG can raise ORA-01489 (result of string
+              concatenation is too long) if a parameter has very long values
+              across many instances - the aggregate is capped at 4000 bytes.
+              On 12.2+ add ON OVERFLOW TRUNCATE after the separator; on 11g
+              wrap the concatenated expression in SUBSTR instead.
    ============================================================================= */
 
 col name for a42

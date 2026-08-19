@@ -3,7 +3,7 @@
               long it has been on the current call.
    VIEWS    : gv$session
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : &sid - session to inspect
    NOTES    : For an INACTIVE session, last_call_et is idle time, not run time.
    ============================================================================= */

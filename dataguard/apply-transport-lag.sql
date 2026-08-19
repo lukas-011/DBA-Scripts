@@ -5,8 +5,9 @@
    VIEWS    : gv$dataguard_stats
    LICENSE  : Data Guard is included in Enterprise Edition. Opening the standby
               READ ONLY while applying is Active Data Guard, which is EXTRA.
-   RAC      : Yes (gv$ - REQUIRED on a RAC standby; only the apply instance
-              reports meaningful apply lag, the others show it as unavailable)
+   RAC      : GV$ REQUIRED - on a RAC standby, only the apply instance reports
+              meaningful apply lag; the others report it as unavailable, so
+              querying a single instance can look like a healthy zero lag.
    PARAMS   : None
    NOTES    : Transport lag high, apply lag low  => network or archiver problem.
               Transport lag low,  apply lag high => MRP is slow or stopped.

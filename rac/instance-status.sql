@@ -3,7 +3,7 @@
               when. Run this first when a node is suspected down.
    VIEWS    : gv$instance
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED, this is the point of the script)
+   RAC      : GV$ REQUIRED - this is the point of the script)
    PARAMS   : None
    NOTES    : gv$ only reaches instances that are actually up, so a missing
               instance number is itself the finding. Compare the row count

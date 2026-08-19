@@ -4,7 +4,7 @@
               one level, or when the blocker is on another instance.
    VIEWS    : gv$wait_chains
    LICENSE  : None
-   RAC      : Yes - and this is the reason to prefer it over gv$lock joins:
+   RAC      : GV$ REQUIRED - and the reason to prefer this over gv$lock joins:
               gv$wait_chains resolves chains that cross instances, which a
               manual self-join of gv$lock does not do reliably.
    PARAMS   : None

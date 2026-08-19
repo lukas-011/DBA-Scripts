@@ -2,9 +2,10 @@
    PURPOSE  : GENERATE the correct ALTER SYSTEM KILL SESSION statements for
               sessions matching a filter. Prints DDL only - nothing is killed
               until you run the generated statements.
-   VIEWS    : gv$session
+   VIEWS    : gv$session, v$instance, v$mystat (the latter two only to exclude
+              your own session from the generated statements)
    LICENSE  : None
-   RAC      : Yes - and this is the reason to generate rather than hand-type.
+   RAC      : GV$ REQUIRED - and the reason to generate rather than hand-type.
               The RAC form needs the instance:
                 ALTER SYSTEM KILL SESSION 'sid,serial#,@inst_id' IMMEDIATE;
               Omitting @inst_id targets the instance you are connected to and

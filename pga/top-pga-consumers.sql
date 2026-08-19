@@ -3,7 +3,7 @@
               server is under memory pressure.
    VIEWS    : gv$session, gv$process
    LICENSE  : None
-   RAC      : gv$ reaches every node, but read the results PER NODE - PGA is
+   RAC      : PER-INSTANCE - gv$ reaches every node, but PGA is
               host memory and does not pool across the cluster. inst_id is the
               first column for that reason. When you are chasing memory
               pressure on one specific host, filter to it:

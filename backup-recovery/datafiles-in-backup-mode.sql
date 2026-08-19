@@ -4,8 +4,8 @@
               a classic 3am page after a backup script died halfway.
    VIEWS    : v$backup, v$datafile
    LICENSE  : None
-   RAC      : Yes - v$ is CORRECT (backup state is database-wide in the
-              controlfile, not per-instance).
+   RAC      : V$ CORRECT - backup state is database-wide in the controlfile,
+              not per-instance, so gv$ would repeat each row once per node.
    PARAMS   : None
    NOTES    : Any row returned needs action. Clear with
                 ALTER DATABASE DATAFILE '<name>' END BACKUP;

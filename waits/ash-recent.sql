@@ -4,7 +4,7 @@
               useful diagnostic script when someone says "it was slow at 2pm".
    VIEWS    : gv$active_session_history
    LICENSE  : Diagnostics Pack REQUIRED
-   RAC      : Yes (gv$ - REQUIRED; ASH buffers are per-instance)
+   RAC      : GV$ REQUIRED - ASH buffers are per-instance)
    PARAMS   : &minutes_back - window to analyse, e.g. 30
    NOTES    : ASH samples once per second per active session, so each sample
               row represents roughly one second of database time. That is why

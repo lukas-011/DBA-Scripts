@@ -3,7 +3,7 @@
               when stats were last gathered.
    VIEWS    : dba_ind_statistics
    LICENSE  : None
-   RAC      : N/A (dictionary view)
+   RAC      : N/A - dictionary view, identical from any instance.
    PARAMS   : &owner, &table_name - both case-insensitive
    ============================================================================= */
 

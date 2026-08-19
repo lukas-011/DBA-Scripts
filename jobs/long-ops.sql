@@ -3,7 +3,7 @@
               Covers full scans, RMAN, index builds, gather-stats, data pump.
    VIEWS    : gv$session_longops
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : None
    NOTES    : Only operations Oracle can estimate appear here. Rows persist
               briefly after completion; the sofar <> totalwork filter drops them.

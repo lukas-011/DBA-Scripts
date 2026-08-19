@@ -4,7 +4,7 @@
               database.
    VIEWS    : v$restore_point
    LICENSE  : None (Flashback Database is included in Enterprise Edition)
-   RAC      : Yes - v$ is CORRECT (controlfile-wide, same on every instance).
+   RAC      : V$ CORRECT - (controlfile-wide, same on every instance).
    PARAMS   : None
    NOTES    : GUARANTEE_FLASHBACK_DATABASE = YES is the dangerous kind - it
               pins every flashback log needed to get back to that SCN. Drop it

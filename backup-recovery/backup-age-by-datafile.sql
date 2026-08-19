@@ -3,7 +3,7 @@
               silently dropped out of the backup schedule.
    VIEWS    : v$backup_datafile, v$datafile, v$tablespace
    LICENSE  : None
-   RAC      : Yes - v$ is CORRECT here (controlfile-wide, identical on every
+   RAC      : V$ CORRECT - (controlfile-wide, identical on every
               instance; gv$ would multiply rows by node count).
    PARAMS   : &warn_days - flag files not backed up in this many days, e.g. 7
    NOTES    : A datafile in a read-only or offline tablespace legitimately

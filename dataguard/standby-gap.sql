@@ -1,9 +1,9 @@
 /* =============================================================================
    PURPOSE  : Whether the standby is actually keeping up - archive gaps, and
               the state of the redo transport and apply processes.
-   VIEWS    : v$archive_gap, gv$managed_standby, v$archived_log
+   VIEWS    : v$archive_gap, gv$managed_standby, v$archived_log, v$database
    LICENSE  : Data Guard (included in Enterprise Edition)
-   RAC      : Yes - gaps are per THREAD#, one thread per primary instance.
+   RAC      : MIXED - gaps are per THREAD#, one thread per primary instance.
               v$archive_gap is controlfile-wide so v$ is correct; process state
               is per-instance so gv$ is required there.
    PARAMS   : None

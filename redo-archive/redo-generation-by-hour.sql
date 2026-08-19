@@ -3,7 +3,7 @@
               a slowdown with a batch job, or to size standby bandwidth.
    VIEWS    : dba_hist_sysstat, dba_hist_snapshot
    LICENSE  : Diagnostics Pack REQUIRED (dba_hist_*)
-   RAC      : Yes - broken out by instance_number, since each node generates
+   RAC      : N/A - AWR view. Broken out by instance_number, since each node generates
               its own redo.
    PARAMS   : &days_back - history window, e.g. 7
    NOTES    : dba_hist_sysstat holds cumulative counters, so the per-snapshot

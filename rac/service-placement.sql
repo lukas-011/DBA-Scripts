@@ -4,7 +4,7 @@
               shows up as a difference between the two queries.
    VIEWS    : gv$active_services, dba_services
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED)
+   RAC      : GV$ REQUIRED
    PARAMS   : None
    NOTES    : dba_services lists what is defined in the database; srvctl is the
               authority on preferred/available placement, which is stored in

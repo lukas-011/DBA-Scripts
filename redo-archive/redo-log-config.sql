@@ -3,7 +3,7 @@
               thread. Check this before resizing anything.
    VIEWS    : v$log, v$logfile
    LICENSE  : None
-   RAC      : Yes - every instance needs its own THREAD# with its own groups.
+   RAC      : V$ CORRECT - every instance needs its own THREAD# with its own groups.
               A thread with fewer than 2 groups, or a group with 1 member, is
               a configuration defect. v$ not gv$: both views are
               controlfile-wide and already list all threads.

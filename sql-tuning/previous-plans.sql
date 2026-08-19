@@ -4,7 +4,9 @@
    VIEWS    : dba_hist_sqlstat, dba_hist_snapshot, DBMS_XPLAN.DISPLAY_AWR,
               DBMS_XPLAN.DISPLAY_CURSOR
    LICENSE  : Diagnostics Pack REQUIRED for queries 1-3; query 4 is free
-   RAC      : Yes (instance_number is joined on)
+   RAC      : MIXED - AWR queries 1-3 join on instance_number and so cover the
+              whole cluster; query 4 reads the local cursor cache only and
+              returns the plan for the instance you are connected to.
    PARAMS   : &sql_id - target SQL_ID, e.g. 'abcd1234efgh5'
               &plan_hash_value - for query 3, taken from query 1 or 2
    =============================================================================

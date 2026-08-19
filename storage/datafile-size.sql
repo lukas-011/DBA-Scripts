@@ -3,7 +3,7 @@
               statements to resize them to 30G.
    VIEWS    : dba_data_files
    LICENSE  : None
-   RAC      : N/A (dictionary view)
+   RAC      : N/A - dictionary view, identical from any instance.
    PARAMS   : &tablespace - exact name, UPPERCASE (not case-folded)
    NOTES    : This script only prints DDL - nothing is changed until you run the
               generated statements. Review them first: RESIZE below a file's

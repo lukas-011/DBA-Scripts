@@ -3,7 +3,7 @@
               running many sessions that each look small individually.
    VIEWS    : gv$session, gv$process
    LICENSE  : None
-   RAC      : Per-instance BY DESIGN. gv$ is used to reach every node, but
+   RAC      : PER-INSTANCE - gv$ reaches every node, but
               totals are grouped by inst_id and never summed across the
               cluster - PGA is host memory, so a cluster-wide total is
               meaningless. 200 GB on node 1 and 5 GB on node 2 is a node 1

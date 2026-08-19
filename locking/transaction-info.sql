@@ -3,7 +3,7 @@
               gauge how long a rollback would take before killing it.
    VIEWS    : gv$session, gv$transaction
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : &blocker_sid - SID from blocking-sessions.sql
    NOTES    : No rows means the session has no open transaction.
    ============================================================================= */

@@ -4,7 +4,7 @@
               wrap around.
    VIEWS    : gv$archive_dest_status
    LICENSE  : None
-   RAC      : Yes - gv$ is REQUIRED here. Unlike the controlfile-based redo
+   RAC      : GV$ REQUIRED - unlike the controlfile-based redo
               views, archive destination state is per-instance: one node can
               have a failed destination while the others are fine.
    PARAMS   : None

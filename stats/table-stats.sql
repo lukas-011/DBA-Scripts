@@ -2,7 +2,7 @@
    PURPOSE  : Table-level optimizer statistics, including whether they are stale.
    VIEWS    : dba_tab_statistics
    LICENSE  : None
-   RAC      : N/A (dictionary view)
+   RAC      : N/A - dictionary view, identical from any instance.
    PARAMS   : &owner, &table_name - both case-insensitive
    NOTES    : Returns a row per partition/subpartition on partitioned tables;
               the global row has partition_name IS NULL.

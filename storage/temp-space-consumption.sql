@@ -3,7 +3,7 @@
               you hit ORA-01652 (unable to extend temp segment).
    VIEWS    : gv$tempseg_usage, gv$session, dba_temp_free_space
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : None
    NOTES    : TEMP is shared cluster-wide but consumed per session, so a single
               runaway sort on one node can exhaust it for every node.

@@ -3,7 +3,7 @@
               you can see the SQL_ID and kill the job's session if needed.
    VIEWS    : gv$scheduler_running_jobs, gv$session
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : None
    ============================================================================= */
 

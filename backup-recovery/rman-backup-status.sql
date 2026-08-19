@@ -3,7 +3,7 @@
               The first thing to check when someone asks "are we covered?"
    VIEWS    : v$rman_backup_job_details
    LICENSE  : None
-   RAC      : Yes - v$ is CORRECT here. This view reads the RMAN repository in
+   RAC      : V$ CORRECT. This view reads the RMAN repository in
               the shared controlfile, so every instance returns identical rows;
               gv$ would duplicate each job once per node.
    PARAMS   : &days_back - how far back to look, e.g. 7

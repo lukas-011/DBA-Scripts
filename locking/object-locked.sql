@@ -2,7 +2,7 @@
    PURPOSE  : Which objects a given session holds locks on.
    VIEWS    : gv$locked_object, dba_objects
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : &blocker_sid - SID from blocking-sessions.sql
    ============================================================================= */
 

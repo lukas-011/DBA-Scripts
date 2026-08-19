@@ -3,7 +3,7 @@
               Errors and warnings only by default.
    VIEWS    : gv$diag_alert_ext
    LICENSE  : None
-   RAC      : Yes - gv$ is REQUIRED. Every instance writes its OWN alert log,
+   RAC      : GV$ REQUIRED - every instance writes its OWN alert log,
               and the interesting error is usually on exactly one node.
    PARAMS   : &hours_back - window, e.g. 24
    NOTES    : message_type: 1 UNKNOWN, 2 INCIDENT_ERROR, 3 ERROR, 4 WARNING,

@@ -4,7 +4,7 @@ Oracle DBA query toolkit, grouped by the problem being diagnosed rather
 than the object being queried — so the folder you open is the one matching
 the symptom you were handed.
 
-69 scripts. Every one carries a header block declaring what it reads, what
+85 scripts. Every one carries a header block declaring what it reads, what
 it costs you in licensing, and how it behaves on RAC.
 
 ## Conventions
@@ -38,15 +38,24 @@ bare licence.
 ## The RAC rule
 
 "Make it RAC friendly" does **not** mean "use `gv$` everywhere." Blanket
-`gv$` introduces two distinct bugs. Each script's `RAC:` line states which
-of four cases it is:
+`gv$` introduces two distinct bugs: it duplicates rows from controlfile-wide
+views, and it invites summing per-host resources into a cluster total that
+describes no actual machine.
 
-| Case | Meaning | Example |
-|---|---|---|
-| `Yes (gv$ - REQUIRED)` | State is genuinely per-instance; `v$` would silently report one node's answer as the whole cluster's | [current-waits.sql](waits/current-waits.sql), [non-default-parameters.sql](config/non-default-parameters.sql) |
-| `Yes - v$ is CORRECT here` | View reads the **shared controlfile**; every instance returns identical rows, so `gv$` duplicates each row once per node | [rman-backup-status.sql](backup-recovery/rman-backup-status.sql), [log-switch-frequency.sql](redo-archive/log-switch-frequency.sql) |
-| `Per-instance BY DESIGN` | `gv$` reaches every node, but totals are **never summed** across them, because the resource is per-host | [pga-consumers-by-user.sql](pga/pga-consumers-by-user.sql) |
-| `N/A - dictionary view` | `dba_*` view, identical from any instance; `gv$` does not apply | [invalid-objects.sql](objects/invalid-objects.sql) |
+Every `RAC:` field therefore begins with one of five canonical tags, so the
+whole toolkit can be audited with a single grep:
+
+```
+grep -rh '^   RAC      :' --include=*.sql . | sed 's/.*: //' | cut -d' ' -f1-2 | sort | uniq -c
+```
+
+| Tag | Meaning | Count | Example |
+|---|---|---|---|
+| `GV$ REQUIRED` | State is genuinely per-instance; `v$` would silently report one node's answer as the whole cluster's | 34 | [current-waits.sql](waits/current-waits.sql), [non-default-parameters.sql](config/non-default-parameters.sql) |
+| `N/A` | `dba_*` or AWR view, identical from any instance; `gv$` does not apply | 29 | [invalid-objects.sql](objects/invalid-objects.sql) |
+| `V$ CORRECT` | View reads the **shared controlfile**; every instance returns identical rows, so `gv$` duplicates each row once per node | 10 | [rman-backup-status.sql](backup-recovery/rman-backup-status.sql), [log-switch-frequency.sql](redo-archive/log-switch-frequency.sql) |
+| `PER-INSTANCE` | `gv$` reaches every node, but totals are **never summed** across them, because the resource is per-host memory | 7 | [pga-consumers-by-user.sql](pga/pga-consumers-by-user.sql), [sga-summary.sql](sga/sga-summary.sql) |
+| `MIXED` | Deliberately uses both, for the reason stated in the header | 5 | [daily-health-check.sql](health-check/daily-health-check.sql) |
 
 Three specifics worth internalising, each of which has bitten people:
 
@@ -72,7 +81,10 @@ Three specifics worth internalising, each of which has bitten people:
 | "This query got slow" | [sql-tuning/previous-plans.sql](sql-tuning/previous-plans.sql) |
 | "We're out of space" | [space-growth/tablespace-headroom.sql](space-growth/tablespace-headroom.sql) |
 | "Are we backed up?" | [backup-recovery/rman-backup-status.sql](backup-recovery/rman-backup-status.sql) |
-| "The server is swapping" | [pga/top-pga-consumers.sql](pga/top-pga-consumers.sql) |
+| "The server is swapping" | [pga/top-pga-consumers.sql](pga/top-pga-consumers.sql), then [sga/sga-summary.sql](sga/sga-summary.sql) |
+| "Snapshot too old" | [undo/undo-usage.sql](undo/undo-usage.sql) |
+| "Disk group is full" | [asm/diskgroup-space.sql](asm/diskgroup-space.sql) |
+| "Storage feels slow" | [io/datafile-io.sql](io/datafile-io.sql), [io/io-by-function.sql](io/io-by-function.sql) |
 | Unfamiliar database | [config/db-summary.sql](config/db-summary.sql), [config/non-default-parameters.sql](config/non-default-parameters.sql) |
 | Morning check | [health-check/daily-health-check.sql](health-check/daily-health-check.sql) |
 
@@ -109,6 +121,15 @@ Three specifics worth internalising, each of which has bitten people:
 | [awr-top-sql.sql](sql-tuning/awr-top-sql.sql) | Heaviest SQL over a historical window | **Diag Pack** | gv$ req'd |
 | [previous-plans.sql](sql-tuning/previous-plans.sql) | Did the plan change, and is the new one worse | **Diag Pack** (Q1–3) | gv$ req'd |
 | [get-sql-from-sqlid.sql](sql-tuning/get-sql-from-sqlid.sql) | SQL text behind a SQL_ID | None | gv$ req'd |
+| [plan-baselines.sql](sql-tuning/plan-baselines.sql) | Baselines and profiles — why a plan will not change | EE / Tuning Pack | N/A |
+
+### sga/ — instance memory
+| Script | Purpose | License | RAC |
+|---|---|---|---|
+| [sga-summary.sql](sga/sga-summary.sql) | SGA layout and automatic resize activity | None | Per-instance |
+| [buffer-cache.sql](sga/buffer-cache.sql) | Cache efficiency and whether more would help | None | Per-instance |
+| [shared-pool.sql](sga/shared-pool.sql) | Library cache, plus the literal-SQL check behind ORA-04031 | None | Per-instance |
+| [memory-advisors.sql](sga/memory-advisors.sql) | Oracle's own SGA/PGA/shared pool sizing advice | None | Per-instance |
 
 ### pga/ — process memory pressure
 | Script | Purpose | License | RAC |
@@ -134,6 +155,25 @@ Three specifics worth internalising, each of which has bitten people:
 | [top-segments-by-size.sql](space-growth/top-segments-by-size.sql) | Where the space actually went | None | N/A |
 | [temp-space-consumption.sql](storage/temp-space-consumption.sql) | TEMP headroom and who is burning it | None | gv$ req'd |
 | [datafile-size.sql](storage/datafile-size.sql) | Generates RESIZE DDL — review before running | None | N/A |
+| [recyclebin.sql](storage/recyclebin.sql) | Space held by dropped objects — quickest space win | None | N/A |
+
+### undo/ — "snapshot too old"
+| Script | Purpose | License | RAC |
+|---|---|---|---|
+| [undo-usage.sql](undo/undo-usage.sql) | Undo space, tuned retention, and the ORA-01555 counter | None | gv$ req'd |
+| [long-running-queries.sql](undo/long-running-queries.sql) | Queries outrunning retention — at risk *before* they fail | None | gv$ req'd |
+
+### asm/ — storage layer
+| Script | Purpose | License | RAC |
+|---|---|---|---|
+| [diskgroup-space.sql](asm/diskgroup-space.sql) | Capacity — **negative usable_file_mb is an emergency** | None | gv$ req'd |
+| [disk-balance.sql](asm/disk-balance.sql) | Failgroup layout, rebalance state, disk I/O errors | None | gv$ req'd |
+
+### io/ — where the time goes on disk
+| Script | Purpose | License | RAC |
+|---|---|---|---|
+| [datafile-io.sql](io/datafile-io.sql) | Per-file read/write service times | None | gv$ req'd |
+| [io-by-function.sql](io/io-by-function.sql) | I/O by cause — cache, direct, RMAN, LGWR | None | gv$ req'd |
 
 ### backup-recovery/ — "are we covered?"
 | Script | Purpose | License | RAC |
@@ -161,6 +201,7 @@ Three specifics worth internalising, each of which has bitten people:
 | [service-placement.sql](rac/service-placement.sql) | Running vs defined services | None | gv$ req'd |
 | [gc-waits.sql](rac/gc-waits.sql) | Global cache waits — cost of cross-node block shipping | None | gv$ req'd |
 | [interconnect-config.sql](rac/interconnect-config.sql) | Interconnect networks — IS_PUBLIC must be NO | None | gv$ req'd |
+| [sequence-cache.sql](rac/sequence-cache.sql) | Sequences causing cluster-wide contention | None | N/A |
 
 ### dataguard/ — standby health
 | Script | Purpose | License | RAC |
@@ -177,6 +218,7 @@ Three specifics worth internalising, each of which has bitten people:
 | [disabled-constraints.sql](objects/disabled-constraints.sql) | Disabled or NOVALIDATE constraints | None | N/A |
 | [objects-changed-recently.sql](objects/objects-changed-recently.sql) | "What changed?" when nobody admits to deploying | None | N/A |
 | [extract-ddl.sql](objects/extract-ddl.sql) | Full DDL — the cheapest rollback plan there is | None | N/A |
+| [partition-inventory.sql](objects/partition-inventory.sql) | Partition counts and whether the newest boundary is future | **Partitioning** | N/A |
 
 ### stats/ — optimizer statistics
 | Script | Purpose | License | RAC |
@@ -208,6 +250,7 @@ Every script here **prints statements only**. Review before running.
 |---|---|---|---|
 | [long-ops.sql](jobs/long-ops.sql) | Long operations in flight, % complete and ETA | None | gv$ req'd |
 | [running-jobs.sql](jobs/running-jobs.sql) | Scheduler jobs running now, with their sessions | None | gv$ req'd |
+| [datapump-jobs.sql](jobs/datapump-jobs.sql) | Data Pump jobs, with orphaned ones flagged | None | Mixed |
 
 ### security/ — access and privileges
 | Script | Purpose | License | RAC |
@@ -215,6 +258,7 @@ Every script here **prints statements only**. Review before running.
 | [privileged-users.sql](security/privileged-users.sql) | Who holds DBA roles, ANY-privileges, SYSDBA | None | v$ correct |
 | [user-privileges.sql](security/user-privileges.sql) | Everything one user can do, following nested roles | None | N/A |
 | [expiring-passwords.sql](security/expiring-passwords.sql) | Accounts about to expire or already locked | None | N/A |
+| [failed-logins.sql](security/failed-logins.sql) | Locked-out accounts and failed logon attempts | None | N/A |
 | [privs-needed-for-table-access.sql](security/privs-needed-for-table-access.sql) | Object grants on a table | None | N/A |
 
 ## Setup
@@ -224,6 +268,21 @@ from this directory. It sets shared formatting, readable date formats,
 `VERIFY OFF`, and a `user@instance` prompt so production is visually
 distinct from dev before you run anything. Per-column `COL ... FOR ...`
 formatting stays inside individual scripts.
+
+## Verification
+
+```
+bash tools/verify-scripts.sh
+```
+
+Runs without a database. Checks parenthesis balance, trailing commas before
+`FROM`, dangling booleans, substitution variables that the header does not
+document, `VIEWS:` claims that no longer match the SQL, SQL\*Plus state left
+modified, canonical RAC tags, and cross-references between scripts.
+
+It cannot validate column names or view availability — only a real database
+can. Green means "will parse and is documented honestly", not "returns
+correct results".
 
 ## Caveats
 
@@ -236,6 +295,13 @@ formatting stays inside individual scripts.
 - The projection in
   [tablespace-growth-trend.sql](space-growth/tablespace-growth-trend.sql)
   is a naive linear fit — a triage signal, not a capacity plan.
-- Nothing here has been executed against a live database in this repo's
-  history. Review before running in production, particularly the
-  `maintenance/` generators.
+- `gv$asm_*` returns full detail only from an ASM instance; from a database
+  instance the views are populated but sparser.
+- [io-by-function.sql](io/io-by-function.sql) needs 11g or later.
+- [failed-logins.sql](security/failed-logins.sql) contains both a 12c+
+  unified-auditing query and an 11g traditional-auditing one. Run the one
+  matching your release; the other raises ORA-00942 by design.
+- **Nothing here has been executed against a live database.** Static
+  verification passes, but column names and view availability across
+  versions are checked against knowledge, not execution. Review before
+  running in production, particularly the `maintenance/` generators.

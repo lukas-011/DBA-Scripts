@@ -4,7 +4,7 @@
               spfile edits not yet in effect.
    VIEWS    : gv$parameter, gv$spparameter
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED; sid-qualified spfile entries are per-instance)
+   RAC      : GV$ REQUIRED - sid-qualified spfile entries are per-instance)
    PARAMS   : None
    NOTES    : This is the check that catches "we fixed it last month" changes
               made with SCOPE=MEMORY that vanished at the next bounce. Run it

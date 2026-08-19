@@ -3,7 +3,7 @@
               limit on each user's profile so you can see who is near the cap.
    VIEWS    : gv$session, dba_users, dba_profiles
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : None
    NOTES    : SESSIONS_PER_USER is enforced per instance, not cluster-wide, so
               compare the limit against max_on_one_instance rather than the

@@ -4,7 +4,7 @@
               partitioned well across instances.
    VIEWS    : gv$system_event, gv$sysstat
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED)
+   RAC      : GV$ REQUIRED
    PARAMS   : None
    NOTES    : 'gc cr block busy' and 'gc buffer busy acquire/release' point at
               hot blocks contended across nodes - often a sequence without

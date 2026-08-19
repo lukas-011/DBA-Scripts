@@ -3,7 +3,7 @@
               when lag is climbing and you do not know why.
    VIEWS    : v$dataguard_status
    LICENSE  : Data Guard (included in Enterprise Edition)
-   RAC      : Yes - v$ is correct; the view is fed from the local instance's
+   RAC      : V$ CORRECT - the view is fed from the local instance's
               Data Guard processes. Run it on the node reporting the problem,
               or use gv$dataguard_status to sweep all nodes at once.
    PARAMS   : &hours_back - window, e.g. 24

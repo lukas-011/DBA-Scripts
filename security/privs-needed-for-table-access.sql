@@ -3,7 +3,7 @@
               whether they can pass it on.
    VIEWS    : dba_tab_privs
    LICENSE  : None
-   RAC      : N/A (dictionary view)
+   RAC      : N/A - dictionary view, identical from any instance.
    PARAMS   : &table_name - table to inspect (case-insensitive)
    NOTES    : Direct object grants only. Access via roles, ANY-privileges, or
               ownership will not show up here.

@@ -4,7 +4,7 @@
               runaway app servers.
    VIEWS    : gv$session
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : None
    NOTES    : ACTIVE vs INACTIVE matters more than the total. A machine with
               600 sessions of which 3 are active is an oversized pool; one with

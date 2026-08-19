@@ -3,7 +3,7 @@
               hangs the database - archiver stuck, no new transactions.
    VIEWS    : v$recovery_file_dest, v$recovery_area_usage
    LICENSE  : None
-   RAC      : Yes - v$ is CORRECT (the FRA is shared storage; every instance
+   RAC      : V$ CORRECT - (the FRA is shared storage; every instance
               reports the same numbers, gv$ would just duplicate them).
    PARAMS   : None
    NOTES    : Watch RECLAIMABLE, not used. An FRA at 95% used but 80%

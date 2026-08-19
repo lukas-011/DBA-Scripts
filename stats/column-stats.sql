@@ -3,7 +3,7 @@
               counts. Use when the optimizer misjudges a predicate's selectivity.
    VIEWS    : dba_tab_col_statistics
    LICENSE  : None
-   RAC      : N/A (dictionary view)
+   RAC      : N/A - dictionary view, identical from any instance.
    PARAMS   : &owner, &table_name - both case-insensitive
    NOTES    : Does not show histograms. Join to dba_tab_histograms, or check the
               histogram column in dba_tab_col_statistics, for skew detail.

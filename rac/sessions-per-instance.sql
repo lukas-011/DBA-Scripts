@@ -3,7 +3,7 @@
               which is usually a service or client-side TNS problem.
    VIEWS    : gv$session, gv$instance
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED)
+   RAC      : GV$ REQUIRED
    PARAMS   : None
    NOTES    : Perfectly even distribution is not the goal - services are often
               deliberately pinned to a subset of nodes. Check

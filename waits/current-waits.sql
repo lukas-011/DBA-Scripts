@@ -4,7 +4,7 @@
               stuck, this shows what they are stuck on.
    VIEWS    : gv$session
    LICENSE  : None
-   RAC      : Yes (gv$ - waits are per-instance and REQUIRE gv$)
+   RAC      : GV$ REQUIRED - waits are per-instance.
    PARAMS   : None
    NOTES    : Idle wait classes are excluded, otherwise the output is drowned
               in 'SQL*Net message from client'. blocking_session is populated

@@ -3,7 +3,7 @@
               concurrency problem from a cluster problem in one glance.
    VIEWS    : gv$system_wait_class
    LICENSE  : None
-   RAC      : Yes (gv$ - REQUIRED). A high 'Cluster' class here is the cue to
+   RAC      : GV$ REQUIRED. A high 'Cluster' class here is the cue to
               go to rac/gc-waits.sql.
    PARAMS   : None
    NOTES    : Cumulative since startup. Percentages are within each instance,

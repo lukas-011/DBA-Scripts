@@ -3,7 +3,7 @@
               identity, mode, role, size and instance layout.
    VIEWS    : v$database, gv$instance, dba_data_files, dba_temp_files, v$log
    LICENSE  : None
-   RAC      : Mixed by design - v$database is controlfile-wide (v$ correct),
+   RAC      : MIXED - v$database is controlfile-wide (v$ correct),
               gv$instance must be gv$ to enumerate nodes.
    PARAMS   : None
    NOTES    : Check log_mode ARCHIVELOG and database_role before assuming a

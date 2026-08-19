@@ -3,7 +3,7 @@
               report that something is hung.
    VIEWS    : gv$lock, gv$session
    LICENSE  : None
-   RAC      : Yes (gv$ - all instances)
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
    PARAMS   : None
    NOTES    : Shows one hop only. For a multi-level chain, re-run against the
               blocker to find who is blocking it. Feed blocker_sid into

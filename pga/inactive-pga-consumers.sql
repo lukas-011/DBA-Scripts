@@ -3,7 +3,7 @@
               you need memory back - nothing is running, but memory is held.
    VIEWS    : gv$session, gv$process
    LICENSE  : None
-   RAC      : gv$ reaches every node, but read the results PER NODE - PGA is
+   RAC      : PER-INSTANCE - gv$ reaches every node, but PGA is
               host memory and does not pool across the cluster. To reclaim
               memory on one specific host, filter to it:
                 AND s.inst_id = <n>
