@@ -1,0 +1,29 @@
+/* =============================================================================
+   PURPOSE  : Transaction size and start time for a session. Use used_ublk to
+              gauge how long a rollback would take before killing it.
+   VIEWS    : gv$session, gv$transaction
+   LICENSE  : None
+   RAC      : GV$ REQUIRED - session and process state is per-instance.
+   PARAMS   : &blocker_sid - SID from blocking-sessions.sql
+   NOTES    : No rows means the session has no open transaction.
+   ============================================================================= */
+
+col inst_id for 99
+col sid for 9999
+col start_time for a20
+
+SELECT
+    s.inst_id,
+    s.sid,
+    t.start_time,
+    t.used_ublk,
+    t.used_urec
+FROM
+    gv$session s
+JOIN
+    gv$transaction t
+ON
+    s.taddr = t.addr
+AND s.inst_id = t.inst_id
+WHERE
+    s.sid = &blocker_sid;
