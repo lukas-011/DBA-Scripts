@@ -271,18 +271,28 @@ formatting stays inside individual scripts.
 
 ## Verification
 
+**All 85 scripts execute cleanly against Oracle AI Database 26ai Free
+(23.26.2.0.0)** — tested in both `CDB$ROOT` and the `FREEPDB1` PDB, in a
+default SQL\*Plus session with no special client settings.
+
 ```
 bash tools/verify-scripts.sh
 ```
 
-Runs without a database. Checks parenthesis balance, trailing commas before
-`FROM`, dangling booleans, substitution variables that the header does not
-document, `VIEWS:` claims that no longer match the SQL, SQL\*Plus state left
-modified, canonical RAC tags, and cross-references between scripts.
+Eleven static checks, no database needed: parenthesis balance, trailing
+commas before `FROM`, dangling booleans, undocumented substitution
+variables, `VIEWS:` claims that drifted from the SQL, unrestored SQL\*Plus
+state, canonical RAC tags, cross-references, and semicolons inside open
+statements.
 
-It cannot validate column names or view availability — only a real database
-can. Green means "will parse and is documented honestly", not "returns
-correct results".
+Two limits worth stating plainly:
+
+- The test database is **single-instance**. Every `gv$` view and column is
+  confirmed to exist and the queries run, but genuine multi-node behaviour —
+  cross-instance joins returning rows from two nodes, per-thread archivelog
+  gaps, `,@inst_id` actually reaching another node — is unproven.
+- No ASM and no Data Guard, so `asm/` and `dataguard/` are confirmed to
+  parse and run but return no rows here.
 
 ## Caveats
 
@@ -301,7 +311,15 @@ correct results".
 - [failed-logins.sql](security/failed-logins.sql) contains both a 12c+
   unified-auditing query and an 11g traditional-auditing one. Run the one
   matching your release; the other raises ORA-00942 by design.
-- **Nothing here has been executed against a live database.** Static
-  verification passes, but column names and view availability across
-  versions are checked against knowledge, not execution. Review before
-  running in production, particularly the `maintenance/` generators.
+- `gv$wait_chains` and `gv$diag_alert_ext` **do not exist** — those two are
+  `v$`-only views. `v$wait_chains` needs no `gv$` form: it carries
+  `INSTANCE` and `BLOCKER_INSTANCE` and already resolves chains across
+  nodes. `v$diag_alert_ext` reads the local ADR, so on RAC run it per node.
+- The job columns (`owner`, `job_name`, `elapsed_time`, `running_instance`)
+  live in `dba_scheduler_running_jobs`, **not** in
+  `gv$scheduler_running_jobs`, which exposes only `inst_id`, `session_id`,
+  `session_serial_num`, `job_id`, `paddr`, `os_process_id` and
+  `session_stat_cpu`.
+- Scripts were written against 11gR2+ but are only execution-verified on
+  23ai/26ai. Review before running in production, particularly the
+  `maintenance/` generators.

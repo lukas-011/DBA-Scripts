@@ -187,5 +187,26 @@ done
 echo "  (blank above = all resolve)"
 
 echo
+echo "############ 11. SEMICOLON IN A COMMENT INSIDE AN OPEN STATEMENT ############"
+# SQL*Plus terminates a statement on ANY line ending in ';' - even inside a
+# /* */ comment, because its parser is line-based and not comment-aware.
+# Harmless in the leading header comment (the buffer is still empty), fatal
+# once a statement is open: the statement is split and Oracle gets a fragment
+# with an unterminated comment (ORA-01742). Found the hard way on 23ai.
+for f in $FILES; do
+  awk -v F="$f" '
+    { line = $0 }
+    line ~ /^[ \t]*(SELECT|WITH)[ \t]/ { instmt = 1 }
+    index(line, "/*") > 0 { incmt = 1 }
+    incmt && instmt && line ~ /;[ \t]*$/ {
+      printf "%s:%d: comment line ends in a semicolon inside an open statement\n", F, NR
+    }
+    index(line, "*/") > 0 { incmt = 0 }
+    !incmt && line ~ /;[ \t]*$/ { instmt = 0 }
+  ' "$f"
+done
+echo "  (blank above = none)"
+
+echo
 echo "=========================================="
 [ $FAIL -eq 0 ] && echo "RESULT: no issues found" || echo "RESULT: issues found above"

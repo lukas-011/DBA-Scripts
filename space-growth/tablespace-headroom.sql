@@ -1,31 +1,48 @@
 /* =============================================================================
-   PURPOSE  : Real tablespace headroom, accounting for autoextend. This is the
-              number worth alerting on - storage/tablespace-utilization.sql
-              reports current allocation, which reads as 99% full for a healthy
-              autoextending tablespace.
+   PURPOSE  : Real tablespace headroom, distinguishing tablespaces that have a
+              genuine ceiling from those set to autoextend without limit.
    VIEWS    : dba_data_files, dba_free_space, dba_tablespaces
    LICENSE  : None
    RAC      : N/A - dictionary views, identical from any instance.
    PARAMS   : None
-   NOTES    : max_gb is the ceiling the tablespace can autoextend to; for a
-              non-autoextensible file that is simply its current size. A
-              bigfile tablespace or a file at MAXSIZE UNLIMITED is capped by
-              the 32G/128T datafile limit, not by the value shown here.
-              pct_used_of_max is the one to page on.
+   NOTES    : Read the AUTOEXTEND column FIRST; it decides which percentage is
+              meaningful:
+                UNLIMITED - maxbytes is a fiction (32G per smallfile datafile,
+                            32T per bigfile). pct_of_max will read ~0 forever
+                            and is useless. The real limit is free space on the
+                            filesystem or ASM disk group, which the data
+                            dictionary CANNOT see - check asm/diskgroup-space.sql
+                            or the OS. Watch pct_of_alloc instead: hitting it
+                            triggers an autoextend, which fails if the
+                            filesystem is full.
+                CAPPED    - maxbytes is a real limit. pct_of_max is the number
+                            to alert on.
+                FIXED     - no autoextend at all. pct_of_alloc IS pct_of_max,
+                            and hitting it means ORA-01653.
+              Verified on 23ai, where every default tablespace is UNLIMITED and
+              a naive pct-of-max check silently never fires.
    ============================================================================= */
 
-col tablespace_name for a28
+col tablespace_name for a26
+col autoextend for a10
+col contents for a10
 
 SELECT
     df.tablespace_name,
     ts.contents,
-    ROUND(df.alloc_bytes/1024/1024/1024, 2)                        AS allocated_gb,
-    ROUND(df.max_bytes/1024/1024/1024, 2)                          AS max_gb,
+    CASE WHEN df.autoextend_files = 0                THEN 'FIXED'
+         WHEN df.max_bytes >= 34359721984            THEN 'UNLIMITED'
+         ELSE 'CAPPED'
+    END                                                              AS autoextend,
+    ROUND(df.alloc_bytes/1024/1024/1024, 2)                          AS allocated_gb,
     ROUND((df.alloc_bytes - NVL(fs.free_bytes,0))/1024/1024/1024, 2) AS used_gb,
-    ROUND((df.max_bytes - (df.alloc_bytes - NVL(fs.free_bytes,0)))
-          /1024/1024/1024, 2)                                      AS free_to_grow_gb,
     ROUND((df.alloc_bytes - NVL(fs.free_bytes,0))
-          / NULLIF(df.max_bytes,0) * 100, 2)                       AS pct_used_of_max,
+          / NULLIF(df.alloc_bytes,0) * 100, 1)                       AS pct_of_alloc,
+    CASE WHEN df.max_bytes < 34359721984
+         THEN ROUND(df.max_bytes/1024/1024/1024, 2) END              AS max_gb,
+    CASE WHEN df.max_bytes < 34359721984
+         THEN ROUND((df.alloc_bytes - NVL(fs.free_bytes,0))
+                    / NULLIF(df.max_bytes,0) * 100, 1) END           AS pct_of_max,
     df.autoextend_files,
     df.total_files
 FROM
@@ -46,4 +63,7 @@ ON  fs.tablespace_name = df.tablespace_name
 JOIN
     dba_tablespaces ts ON ts.tablespace_name = df.tablespace_name
 ORDER BY
-    pct_used_of_max DESC;
+    NVL(CASE WHEN df.max_bytes < 34359721984
+             THEN (df.alloc_bytes - NVL(fs.free_bytes,0)) / NULLIF(df.max_bytes,0) * 100
+        END,
+        (df.alloc_bytes - NVL(fs.free_bytes,0)) / NULLIF(df.alloc_bytes,0) * 100) DESC;

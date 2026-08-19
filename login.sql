@@ -15,6 +15,12 @@ SET NULL "(null)"
 -- variables, which is noise on the &owner/&table_name style scripts here.
 SET VERIFY OFF
 
+-- By default SQL*Plus treats a blank line inside a statement as a terminator,
+-- which breaks any query formatted with blank lines between its UNION ALL
+-- branches (SP2-0042). Scripts that need this also set it themselves, so they
+-- work when run from outside this directory.
+SET SQLBLANKLINES ON
+
 -- Long enough to show sql_text and DBMS_XPLAN output without truncating.
 SET LONG 100000
 SET LONGCHUNKSIZE 100000

@@ -8,7 +8,10 @@
               scripts for why a cluster-wide PGA total is meaningless.
    PARAMS   : &FROM_DATE_TIME, &TO_DATE_TIME - format YYYY-MM-DD
               &top_n - rows to return, e.g. 50
-   NOTES    : ASH is sampled (1s in memory, 10s persisted to AWR), so short
+   NOTES    : The ASH column is PGA_ALLOCATED. pga_alloc_mem is a gv$process
+              column and does NOT exist in dba_hist_active_sess_history;
+              using it raises ORA-00904.
+              ASH is sampled (1s in memory, 10s persisted to AWR), so short
               spikes can be missed entirely.
               The row cap is applied AFTER grouping and sorting. An earlier
               version had ROWNUM < 2000 in the WHERE clause, which Oracle
@@ -28,7 +31,7 @@ SELECT * FROM (
         s.sql_id,
         s.instance_number,
         s.program,
-        ROUND(MAX(s.pga_alloc_mem) / 1024 / 1024, 2) AS max_pga_alloc_mb,
+        ROUND(MAX(s.pga_allocated) / 1024 / 1024, 2) AS max_pga_alloc_mb,
         COUNT(*)                                     AS ash_samples
     FROM
         dba_hist_active_sess_history s

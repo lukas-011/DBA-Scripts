@@ -15,7 +15,13 @@
               your environment - an 85% tablespace is an emergency in some
               shops and normal in others.
               Drill into any WARN/CRITICAL with the folder named in the check.
+              SQLBLANKLINES is required: this is ONE statement containing blank
+              lines between its UNION ALL branches, and a default SQL*Plus
+              session treats a blank line as a statement terminator - which
+              breaks the query apart with SP2-0042. Verified against 23ai.
    ============================================================================= */
+
+SET SQLBLANKLINES ON
 
 col check_name for a28
 col status for a10
@@ -39,36 +45,71 @@ SELECT check_name, status, detail FROM (
     FROM   v$database
 
     UNION ALL
-    /* Tablespaces near their autoextend ceiling -------------------------- */
+    /* Tablespace headroom ------------------------------------------------
+       Only tablespaces with a REAL ceiling (fixed size, or capped autoextend)
+       are graded. Two wrong ways to do this, both verified on 23ai.
+       First, measuring against maxbytes when autoextend is UNLIMITED reads
+       ~0% forever, so the check never fires. Second, measuring UNLIMITED
+       against allocated size reads ~99% forever, because Oracle deliberately
+       keeps datafiles full and extends on demand, so the check cries wolf
+       every morning.
+       An UNLIMITED tablespace is bounded by filesystem or ASM free space,
+       which SQL cannot see. It is counted and named as unassessable rather
+       than being given a misleading verdict.
+       -------------------------------------------------------------------- */
     SELECT 3, 'Tablespace headroom',
-           CASE WHEN MAX(pct) >= 95 THEN 'CRITICAL'
-                WHEN MAX(pct) >= 85 THEN 'WARN' ELSE 'OK' END,
-           CASE WHEN MAX(pct) >= 85
-                THEN COUNT(CASE WHEN pct >= 85 THEN 1 END) ||
-                     ' tablespace(s) over 85% of max; worst=' ||
-                     MAX(tablespace_name) KEEP (DENSE_RANK LAST ORDER BY pct) ||
-                     ' at ' || ROUND(MAX(pct),1) || '%'
-                ELSE 'worst tablespace at ' || ROUND(MAX(pct),1) || '% of max'
+           CASE WHEN capped_cnt = 0                THEN 'N/A'
+                WHEN worst_capped_pct >= 95        THEN 'CRITICAL'
+                WHEN worst_capped_pct >= 85        THEN 'WARN'
+                ELSE 'OK' END,
+           CASE WHEN capped_cnt = 0
+                THEN 'all ' || unlimited_cnt ||
+                     ' tablespace(s) autoextend UNLIMITED - check filesystem/ASM'
+                ELSE worst_capped_name || ' at ' || ROUND(worst_capped_pct,1) ||
+                     '% of its limit' ||
+                     CASE WHEN unlimited_cnt > 0
+                          THEN ' (' || unlimited_cnt || ' more UNLIMITED, not assessable)'
+                     END
            END
-    FROM ( SELECT df.tablespace_name,
-                  (SUM(df.bytes) - NVL(MAX(fs.free_bytes),0))
-                    / NULLIF(SUM(CASE WHEN df.autoextensible='YES'
-                                      THEN GREATEST(df.maxbytes, df.bytes)
-                                      ELSE df.bytes END),0) * 100 AS pct
-           FROM   dba_data_files df
-           LEFT JOIN (SELECT tablespace_name, SUM(bytes) free_bytes
-                      FROM dba_free_space GROUP BY tablespace_name) fs
-                  ON fs.tablespace_name = df.tablespace_name
-           GROUP BY df.tablespace_name )
+    FROM ( SELECT COUNT(CASE WHEN has_real_limit = 'Y' THEN 1 END)      AS capped_cnt,
+                  COUNT(CASE WHEN has_real_limit = 'N' THEN 1 END)      AS unlimited_cnt,
+                  MAX(CASE WHEN has_real_limit = 'Y' THEN pct END)      AS worst_capped_pct,
+                  MAX(CASE WHEN has_real_limit = 'Y' THEN tablespace_name END)
+                    KEEP (DENSE_RANK LAST ORDER BY CASE WHEN has_real_limit='Y' THEN pct END
+                          NULLS FIRST)                                  AS worst_capped_name
+           FROM ( SELECT tablespace_name,
+                  CASE WHEN max_bytes < 34359721984 THEN 'Y' ELSE 'N' END AS has_real_limit,
+                  (alloc_bytes - free_bytes)
+                    / NULLIF(CASE WHEN max_bytes < 34359721984
+                                  THEN max_bytes ELSE alloc_bytes END, 0) * 100 AS pct
+           FROM ( SELECT df.tablespace_name,
+                         SUM(df.bytes) AS alloc_bytes,
+                         SUM(CASE WHEN df.autoextensible='YES'
+                                  THEN GREATEST(df.maxbytes, df.bytes)
+                                  ELSE df.bytes END) AS max_bytes,
+                         NVL(MAX(fs.free_bytes),0) AS free_bytes
+                  FROM   dba_data_files df
+                  LEFT JOIN (SELECT tablespace_name, SUM(bytes) free_bytes
+                             FROM dba_free_space GROUP BY tablespace_name) fs
+                         ON fs.tablespace_name = df.tablespace_name
+                  GROUP BY df.tablespace_name ) ) )
 
     UNION ALL
-    /* Flash recovery area ------------------------------------------------ */
+    /* Flash recovery area ------------------------------------------------
+       v$recovery_file_dest is EMPTY when db_recovery_file_dest is unset.
+       Reporting OK on no rows would be a check that silently never runs, so
+       the empty case is reported explicitly instead.
+       -------------------------------------------------------------------- */
     SELECT 4, 'FRA usage',
-           CASE WHEN NVL(MAX(pct_unreclaimable),0) >= 90 THEN 'CRITICAL'
-                WHEN NVL(MAX(pct_unreclaimable),0) >= 75 THEN 'WARN'
+           CASE WHEN COUNT(*) = 0                  THEN 'NOT SET'
+                WHEN MAX(pct_unreclaimable) >= 90  THEN 'CRITICAL'
+                WHEN MAX(pct_unreclaimable) >= 75  THEN 'WARN'
                 ELSE 'OK' END,
-           NVL(TO_CHAR(ROUND(MAX(pct_unreclaimable),1)),'0') ||
-           '% used and not reclaimable'
+           CASE WHEN COUNT(*) = 0
+                THEN 'db_recovery_file_dest not configured - check not run'
+                ELSE ROUND(MAX(pct_unreclaimable),1) ||
+                     '% used and not reclaimable'
+           END
     FROM ( SELECT (space_used - space_reclaimable)/NULLIF(space_limit,0)*100
                     AS pct_unreclaimable
            FROM   v$recovery_file_dest )
