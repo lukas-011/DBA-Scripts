@@ -1,3 +1,12 @@
+/* =============================================================================
+   PURPOSE  : DBMS_SCHEDULER jobs running right now, joined to their session so
+              you can see the SQL_ID and kill the job's session if needed.
+   VIEWS    : gv$scheduler_running_jobs, gv$session
+   LICENSE  : None
+   RAC      : Yes (gv$ - all instances)
+   PARAMS   : None
+   ============================================================================= */
+
 col owner for a12
 col job_name for a25
 col status for a10

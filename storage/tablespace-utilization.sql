@@ -1,3 +1,14 @@
+/* =============================================================================
+   PURPOSE  : Space used and free per permanent tablespace, ordered by fullest.
+   VIEWS    : dba_data_files, dba_free_space
+   LICENSE  : None
+   RAC      : N/A (dictionary view)
+   PARAMS   : None
+   NOTES    : Reports current allocated size, NOT autoextend headroom - a
+              tablespace at 99% may still have room to grow to maxbytes.
+              Excludes TEMP (dba_temp_files) and undo.
+   ============================================================================= */
+
 SELECT
     df.tablespace_name,
     ROUND(SUM(df.bytes)/1024/1024/1024,2) AS total_gb,

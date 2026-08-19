@@ -1,3 +1,12 @@
+/* =============================================================================
+   PURPOSE  : Idle sessions still holding PGA. These are the cheapest wins when
+              you need memory back - nothing is running, but memory is held.
+   VIEWS    : v$session, v$process
+   LICENSE  : None
+   RAC      : No (v$ - current instance only; switch to gv$ for all nodes)
+   PARAMS   : None
+   ============================================================================= */
+
 col sid format 9999
 col serial# format 99999
 col username for a10

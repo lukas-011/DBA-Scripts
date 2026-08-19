@@ -1,14 +1,20 @@
 /* =============================================================================
-   ORACLE: SQL_ID PLAN HISTORY & PERFORMANCE COMPARISON
+   PURPOSE  : SQL_ID plan history and performance comparison - find out when a
+              plan changed and whether the new plan is actually worse.
+   VIEWS    : dba_hist_sqlstat, dba_hist_snapshot, DBMS_XPLAN.DISPLAY_AWR,
+              DBMS_XPLAN.DISPLAY_CURSOR
+   LICENSE  : Diagnostics Pack REQUIRED for queries 1-3; query 4 is free
+   RAC      : Yes (instance_number is joined on)
+   PARAMS   : &sql_id - target SQL_ID, e.g. 'abcd1234efgh5'
+              &plan_hash_value - for query 3, taken from query 1 or 2
    =============================================================================
-   Replace &sql_id below with your target SQL_ID, e.g. 'abcd1234efgh5'.
 
-   Queries 1-2 use the AWR views (DBA_HIST_*):
+   Queries 1-3 use the AWR views (DBA_HIST_* and DBMS_XPLAN.DISPLAY_AWR):
      - Requires the Oracle Diagnostics Pack license.
      - History depth = your AWR retention setting (default 8 days; check/change
        with DBMS_WORKLOAD_REPOSITORY.MODIFY_SNAPSHOT_SETTINGS).
 
-   Query 3 uses V$SQL (cursor cache):
+   Query 4 uses V$SQL (cursor cache):
      - No extra license needed.
      - Only shows plans still resident in the shared pool right now — plans
        get aged out, sometimes within hours, so this is a short-term view.

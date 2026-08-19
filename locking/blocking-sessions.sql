@@ -1,3 +1,15 @@
+/* =============================================================================
+   PURPOSE  : Blocker/blocked session pairs - the first query to run when users
+              report that something is hung.
+   VIEWS    : gv$lock, gv$session
+   LICENSE  : None
+   RAC      : Yes (gv$ - all instances)
+   PARAMS   : None
+   NOTES    : Shows one hop only. For a multi-level chain, re-run against the
+              blocker to find who is blocking it. Feed blocker_sid into
+              object-locked.sql and transaction-info.sql for detail.
+   ============================================================================= */
+
 col inst_id for 99
 col blocker_sid for 9999
 col blocker_serial for 99999

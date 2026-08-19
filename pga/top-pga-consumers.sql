@@ -1,3 +1,14 @@
+/* =============================================================================
+   PURPOSE  : Sessions ranked by PGA in use right now. Start here when the
+              server is under memory pressure.
+   VIEWS    : v$session, v$process
+   LICENSE  : None
+   RAC      : No (v$ - current instance only; switch to gv$ for all nodes)
+   PARAMS   : None
+   NOTES    : pga_alloc_mem is what the OS gave the process; pga_used_mem is
+              what is actually in use. A large gap means memory is held but idle.
+   ============================================================================= */
+
 col sid format 9999
 col serial# format 99999
 col username for a10

@@ -1,3 +1,11 @@
+/* =============================================================================
+   PURPOSE  : Which objects a given session holds locks on.
+   VIEWS    : gv$locked_object, dba_objects
+   LICENSE  : None
+   RAC      : Yes (gv$ - all instances)
+   PARAMS   : &blocker_sid - SID from blocking-sessions.sql
+   ============================================================================= */
+
 col inst_id for 99
 col object_name for a30
 col object_type for a20

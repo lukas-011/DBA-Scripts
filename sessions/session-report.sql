@@ -1,3 +1,14 @@
+/* =============================================================================
+   PURPOSE  : Full connected-session inventory, spooled to a file. Useful as a
+              point-in-time snapshot before a restart or during an incident.
+   VIEWS    : gv$session
+   LICENSE  : None
+   RAC      : Yes (gv$ - all instances)
+   PARAMS   : None
+   OUTPUT   : Spools to session_report.txt in the current working directory,
+              overwriting any existing file of that name.
+   ============================================================================= */
+
 SET LINESIZE 200
 SET PAGESIZE 1000
 SET TRIMSPOOL ON

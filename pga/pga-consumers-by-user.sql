@@ -1,3 +1,12 @@
+/* =============================================================================
+   PURPOSE  : PGA rolled up by user and SQL_ID, to spot an app or statement
+              running many sessions that each look small individually.
+   VIEWS    : v$session, v$process
+   LICENSE  : None
+   RAC      : No (v$ - current instance only; switch to gv$ for all nodes)
+   PARAMS   : None
+   ============================================================================= */
+
 col sid format 9999
 col serial# format 99999
 col username for a10

@@ -1,3 +1,13 @@
+/* =============================================================================
+   PURPOSE  : Full detail on one session - current wait event, SQL_ID, and how
+              long it has been on the current call.
+   VIEWS    : gv$session
+   LICENSE  : None
+   RAC      : Yes (gv$ - all instances)
+   PARAMS   : &sid - session to inspect
+   NOTES    : For an INACTIVE session, last_call_et is idle time, not run time.
+   ============================================================================= */
+
 col inst_id for 99
 col sid for 9999
 col serial# for 99999
